@@ -1,20 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
 import { LeadStatusService } from './lead-status.service';
 import { CreateLeadStatusDto } from './dto/create-lead-status.dto';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
+import { FilterLeadStatusDto } from './dto/filter-lead-status.dto';
 
 @Controller('lead-status')
 export class LeadStatusController {
   constructor(private readonly leadStatusService: LeadStatusService) { }
 
   @Post()
-  create(@Body() createLeadStatusDto: CreateLeadStatusDto) {
-    return this.leadStatusService.create(createLeadStatusDto);
+  async create(@Body() createLeadStatusDto: CreateLeadStatusDto) {
+    return await this.leadStatusService.create(createLeadStatusDto);
   }
 
   @Get()
-  findAll() {
-    return this.leadStatusService.findAll();
+  async findAll(@Query() filters: FilterLeadStatusDto) {
+    return await this.leadStatusService.findAll(filters);
   }
 
   @Get(':id')

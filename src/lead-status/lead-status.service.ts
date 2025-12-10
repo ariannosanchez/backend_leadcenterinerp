@@ -1,10 +1,14 @@
 import { Injectable, InternalServerErrorException, ConflictException, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateLeadStatusDto } from './dto/create-lead-status.dto';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/common/database/prisma.service';
 import { LeadStatus, Prisma } from 'generated/prisma/client';
 import { DbExceptionHandler } from 'src/common/utils/db-exception.handler';
+import { ApiTags } from '@nestjs/swagger';
+import { FilterLeadStatusDto } from './dto/filter-lead-status.dto';
+import { PaginationHelper, PaginationResponse } from 'src/common/utils/pagination.helper';
 
+@ApiTags('Lead Status')
 @Injectable()
 export class LeadStatusService {
   private readonly logger = new Logger(LeadStatusService.name);
@@ -22,8 +26,43 @@ export class LeadStatusService {
     }
   }
 
-  findAll() {
-    return this.prisma.leadStatus.findMany();
+  async findAll(filters: FilterLeadStatusDto): Promise<PaginationResponse<LeadStatus>> {
+    try {
+      const { limit = 10, offset = 0, name, isActive = true } = filters;
+
+      const where: Prisma.LeadStatusWhereInput = {};
+
+      if (isActive !== undefined) {
+        where.isActive = isActive;
+      }
+
+      if (name) {
+        where.name = {
+          contains: name,
+          mode: 'insensitive',
+        };
+      }
+
+      const [data, total] = await Promise.all([
+        this.prisma.leadStatus.findMany({
+          where,
+          skip: offset,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.leadStatus.count({
+          where,
+        })
+      ])
+
+      return {
+        data,
+        meta: PaginationHelper.buildMeta(total, limit, offset, data.length),
+      }
+
+    } catch (error) {
+      throw DbExceptionHandler.handle(error, LeadStatusService.name);
+    }
   }
 
   async findOne(id: string): Promise<LeadStatus> {

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { LeadStatusModule } from '../../lead-status/lead-status.module';
-import { PrismaModule } from './prisma.module';
 import { ConfigModule } from '@nestjs/config';
+import { PrismaModule } from './common/database/prisma.module';
+import { LeadStatusModule } from './lead-status/lead-status.module';
 
 @Module({
   imports: [
