@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './common/database/prisma.module';
 import { LeadStatusModule } from './lead-status/lead-status.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { LeadStatusModule } from './lead-status/lead-status.module';
       cache: true,
     }),
     PrismaModule,
-    LeadStatusModule
+    LeadStatusModule,
+    UsersModule
   ],
   controllers: [],
   providers: [],
