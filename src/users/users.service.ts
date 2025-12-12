@@ -2,21 +2,27 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/common/database/prisma.service';
-import { DbExceptionHandler } from 'src/common/utils/db-exception.handler';
 import { Prisma, User } from 'generated/prisma/client';
 import { FilterUserDto } from './dto/filter-user.dto';
+import { DbExceptionHandler } from 'src/common/utils/db-exception.handler';
 import { PaginationHelper, PaginationResponse } from 'src/common/utils/pagination.helper';
+import { HashingService } from 'src/common/providers/hashing/hashing.service';
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger(UsersService.name);
-
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly hashingService: HashingService
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
+      const hashedPassword = await this.hashingService.hash(createUserDto.password);
       const user = await this.prisma.user.create({
-        data: createUserDto,
+        data: {
+          ...createUserDto,
+          password: hashedPassword,
+        }
       })
       return user;
     } catch (error) {
@@ -100,6 +106,7 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
       await this.findOne(id);
+      /** Hashear la contraseña */
       return await this.prisma.user.update({
         where: {
           id,
@@ -112,7 +119,34 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async delete(id: string) {
+    try {
+      await this.findOne(id);
+      return await this.prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          isActive: false,
+        },
+      })
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw DbExceptionHandler.handle(error, UsersService.name);
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      await this.findOne(id);
+      return await this.prisma.user.delete({
+        where: {
+          id,
+        },
+      })
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw DbExceptionHandler.handle(error, UsersService.name);
+    }
   }
 }
