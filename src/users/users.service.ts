@@ -12,18 +12,13 @@ import { HashingService } from 'src/common/providers/hashing/hashing.service';
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly hashingService: HashingService
+    private readonly hashingService: HashingService,
   ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const hashedPassword = await this.hashingService.hash(createUserDto.password);
-      const user = await this.prisma.user.create({
-        data: {
-          ...createUserDto,
-          password: hashedPassword,
-        }
-      })
+      createUserDto.password = await this.hashingService.hash(createUserDto.password.trim());
+      const user = await this.prisma.user.create({ data: createUserDto });
       return user;
     } catch (error) {
       throw DbExceptionHandler.handle(error, UsersService.name);
@@ -106,7 +101,11 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
       await this.findOne(id);
-      /** Hashear la contraseña */
+      // Verificar que la contraseña esté presente antes de hacer hash
+      if (updateUserDto.password) {
+        updateUserDto.password = await this.hashingService.hash(updateUserDto.password.trim());
+      }
+
       return await this.prisma.user.update({
         where: {
           id,
