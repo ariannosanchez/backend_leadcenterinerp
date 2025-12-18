@@ -1,0 +1,14 @@
+import { registerAs } from "@nestjs/config";
+
+export default registerAs('config', () => {
+    return {
+        session: {
+            accessToken: process.env.ACCESS_TOKEN,
+            jwtAccessTokenSecret: process.env.JWT_ACCESS_SECRET,
+            jwtAccessTokenExpires: process.env.JWT_EXPIRES_TIME,
+            jwtRefreshTokenSecret: process.env.JWT_REFRESH_SECRET,
+            jwtRefreshTokenExpiresTime: process.env.JWT_REFRESH_EXPIRES_TIME,
+            secretSession: process.env.SECRET_SESSION,
+        }
+    }
+})
