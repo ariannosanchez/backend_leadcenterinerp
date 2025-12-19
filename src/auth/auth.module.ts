@@ -6,23 +6,23 @@ import { BcryptService } from 'src/common/providers/hashing/bcrypt.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [{ provide: HashingService, useClass: BcryptService }, AuthService, LocalStrategy],
+  providers: [{ provide: HashingService, useClass: BcryptService }, AuthService, LocalStrategy, JwtStrategy],
   imports: [
-    ConfigModule,
     JwtModule.registerAsync({
-      imports: [ ConfigModule ],
-      inject: [ ConfigService ],
+      imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         return {
-          secret: configService.get('JWT_SECRET'),
+          secret: configService.get('JWT_ACCESS_SECRET'),
           signOptions: {
-            expiresIn: '2h'
+            expiresIn: configService.get('JWT_ACCESS_EXPIRES_TIME')
           }
         }
-      },
+      }
     })
   ]
 })

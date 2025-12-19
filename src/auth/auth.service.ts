@@ -6,47 +6,47 @@ import { HashingService } from 'src/common/providers/hashing/hashing.service';
 import { PayloadToken } from './interfaces/token.entity';
 import { JwtService } from '@nestjs/jwt';
 import config from 'src/config';
-import { ConfigType } from '@nestjs/config';
+import { ConfigService, ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
 
   constructor(
-    @Inject(config.KEY) private readonly configService: ConfigType<typeof config>,
     private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
     private readonly hashingService: HashingService,
     private readonly jwtService: JwtService,
   ) { }
 
-  // async generateJwtAccesToken(payload: PayloadToken){
-  //   try {
-      
-  //     const accessToken = this.jwtService.signAsync(payload, {
-  //       secret: this.configService.session.jwtAccessTokenSecret,
-  //       expiresIn: this.configService.session.jwtAccessTokenExpires
-  //     })
+  async generateJwtAccesToken(payload: PayloadToken) {
+    try {
 
-  //     return accessToken;
+      const accessToken = this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        expiresIn: this.configService.get<number>('JWT_ACCESS_EXPIRES_TIME')
+      })
 
-  //   } catch (error) {
-  //     throw DbExceptionHandler.handle(error, AuthService.name)
-  //   }
-  // }
+      return accessToken;
 
-  // async generateJwtRefreshToken(payload: PayloadToken){
-  //   try {
-      
-  //     const refreshToken = this.jwtService.signAsync(payload, {
-  //       secret: this.configService.session.jwtRefreshTokenExpiresTime,
-  //       expiresIn: this.configService.session.jwtRefreshTokenExpiresTime
-  //     })
+    } catch (error) {
+      throw DbExceptionHandler.handle(error, AuthService.name)
+    }
+  }
 
-  //     return refreshToken;
+  async generateJwtRefreshToken(payload: PayloadToken) {
+    try {
 
-  //   } catch (error) {
-  //     throw DbExceptionHandler.handle(error, AuthService.name)
-  //   }
-  // }
+      const refreshToken = this.jwtService.signAsync(payload, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: this.configService.get<number>('JWT_REFRESH_EXPIRES_TIME')
+      })
+
+      return refreshToken;
+
+    } catch (error) {
+      throw DbExceptionHandler.handle(error, AuthService.name)
+    }
+  }
 
   // Login usado en local strategy
   async findUserToAuthenticated(loginAuthDto: LoginAuthDto) {
