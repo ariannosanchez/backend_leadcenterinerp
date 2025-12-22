@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/common/database/prisma.service';
@@ -6,21 +6,26 @@ import { Prisma, User } from 'generated/prisma/client';
 import { FilterUserDto } from './dto/filter-user.dto';
 import { DbExceptionHandler } from 'src/common/utils/db-exception.handler';
 import { PaginationHelper, PaginationResponse } from 'src/common/utils/pagination.helper';
-import { HashingService } from 'src/common/providers/hashing/hashing.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly hashingService: HashingService,
   ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      createUserDto.password = await this.hashingService.hash(createUserDto.password.trim());
-      const user = await this.prisma.user.create({ data: createUserDto });
+      const { password, ...userData } = createUserDto;
+      const user = await this.prisma.user.create({
+        data: {
+          ...userData,
+          password: bcrypt.hashSync(password, 10),
+        }
+      });
       return user;
     } catch (error) {
+      if (error instanceof BadRequestException) throw error;
       throw DbExceptionHandler.handle(error, UsersService.name);
     }
   }
@@ -98,12 +103,12 @@ export class UsersService {
     }
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     try {
       await this.findOne(id);
       // Verificar que la contraseña esté presente antes de hacer hash
       if (updateUserDto.password) {
-        updateUserDto.password = await this.hashingService.hash(updateUserDto.password.trim());
+        updateUserDto.password = bcrypt.hashSync(updateUserDto.password.trim(), 10);
       }
 
       return await this.prisma.user.update({
@@ -113,7 +118,7 @@ export class UsersService {
         data: updateUserDto,
       })
     } catch (error) {
-      if (error instanceof NotFoundException) throw error;
+      if (error instanceof BadRequestException) throw error;
       throw DbExceptionHandler.handle(error, UsersService.name);
     }
   }
