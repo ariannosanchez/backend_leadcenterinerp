@@ -3,8 +3,10 @@ import { LeadStatusService } from './lead-status.service';
 import { CreateLeadStatusDto } from './dto/create-lead-status.dto';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
 import { FilterLeadStatusDto } from './dto/filter-lead-status.dto';
+import { Auth } from 'src/auth/decorators';
 
 @Controller('lead-status')
+@Auth()
 export class LeadStatusController {
   constructor(private readonly leadStatusService: LeadStatusService) { }
 

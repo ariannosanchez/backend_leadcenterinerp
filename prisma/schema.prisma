@@ -31,6 +31,8 @@ model Lead {
   phone     String
   status    LeadStatus @relation(fields: [statusId], references: [id])
   statusId  String
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
@@ -43,6 +45,7 @@ model User {
   password  String
   isActive  Boolean  @default(true)
   role      String[] @default(["user"])
+  leads     Lead[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

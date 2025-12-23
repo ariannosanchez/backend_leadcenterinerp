@@ -4,6 +4,7 @@ import { PrismaModule } from './common/database/prisma.module';
 import { LeadStatusModule } from './lead-status/lead-status.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { LeadsModule } from './leads/leads.module';
 import config from './config';
 
 @Module({
@@ -18,6 +19,7 @@ import config from './config';
     LeadStatusModule,
     UsersModule,
     AuthModule,
+    LeadsModule,
   ],
   controllers: [],
   providers: [],
