@@ -1,18 +1,8 @@
 import { Transform, Type } from "class-transformer";
 import { IsBoolean, IsInt, IsOptional, IsPositive, IsString, Min } from "class-validator";
+import { PaginationDto } from "src/common/dtos/pagination.dto";
 
-export class FilterLeadStatusDto {
-    @IsOptional()
-    @Type(() => Number)
-    @IsInt()
-    @IsPositive()
-    limit?: number;
-
-    @IsOptional()
-    @Type(() => Number)
-    @IsInt()
-    @Min(0)
-    offset?: number;
+export class FilterLeadStatusDto extends PaginationDto {
 
     @IsOptional()
     @IsString()

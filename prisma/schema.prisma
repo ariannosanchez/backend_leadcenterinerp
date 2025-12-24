@@ -33,6 +33,7 @@ model Lead {
   statusId  String
   user      User       @relation(fields: [userId], references: [id])
   userId    String
+  isActive  Boolean    @default(true)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }

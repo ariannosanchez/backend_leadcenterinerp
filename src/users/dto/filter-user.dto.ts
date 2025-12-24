@@ -1,13 +1,7 @@
 import { IsOptional, IsPositive, Min } from "class-validator";
+import { PaginationDto } from "src/common/dtos/pagination.dto";
 
-export class FilterUserDto {
-    @IsOptional()
-    @IsPositive()
-    limit?: number;
-
-    @IsOptional()
-    @Min(0)
-    offset?: number;
+export class FilterUserDto extends PaginationDto {
 
     @IsOptional()
     firstName?: string;
