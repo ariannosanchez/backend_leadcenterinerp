@@ -5,6 +5,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { User } from 'generated/prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,7 @@ export class AuthService {
 
       const user = await this.prisma.user.findUnique({
         where: { email },
-        select: { email: true, password: true, id: true }
+        select: { email: true, password: true, id: true, role: true, isActive: true, firstName: true, lastName: true }
       });
 
       if (!user) {
@@ -32,12 +33,19 @@ export class AuthService {
       }
 
       return {
-        ...user,
+        user: user,
         token: this.getJwtToken({ id: user.id })
       };
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       throw DbExceptionHandler.handle(error, AuthService.name)
+    }
+  }
+
+  async checkAuthStatus(user: User) {
+    return {
+      user: user,
+      token: this.getJwtToken({ id: user.id })
     }
   }
 
