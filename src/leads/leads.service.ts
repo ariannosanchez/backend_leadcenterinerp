@@ -47,7 +47,7 @@ export class LeadsService {
         }
       }
 
-      const [data, totla] = await Promise.all([
+      const [data, total] = await Promise.all([
         this.prisma.lead.findMany({
           where,
           skip: offset,
@@ -61,7 +61,7 @@ export class LeadsService {
 
       return {
         data,
-        meta: PaginationHelper.buildMeta(totla, limit, offset, data.length),
+        meta: PaginationHelper.buildMeta(total, limit, offset, data.length),
       }
 
     } catch (error) {

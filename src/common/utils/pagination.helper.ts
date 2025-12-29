@@ -3,6 +3,8 @@ export interface PaginationMeta {
     limit: number;
     offset: number;
     count: number;
+    page: number;
+    totalPages: number
 }
 
 export interface PaginationResponse<T> {
@@ -17,11 +19,15 @@ export class PaginationHelper {
         offset: number,
         count: number
     ): PaginationMeta {
+        const page = Math.floor(offset / limit) + 1;
+        const totalPages = Math.ceil(total / limit);
         return {
             total,
             limit,
             offset,
             count,
+            page,
+            totalPages
         };
     }
 }

@@ -42,7 +42,7 @@ export class UsersService {
           contains: firstName,
           mode: 'insensitive',
         };
-      }
+      }   
 
       if (lastName) {
         where.lastName = {
