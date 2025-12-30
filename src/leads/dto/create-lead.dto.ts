@@ -27,7 +27,7 @@ export class CreateLeadDto {
     @IsNotEmpty()
     @IsUUID()
     @ApiProperty()
-    statusId: string;
+    leadStatusId: string;
 
     @IsNotEmpty()
     @IsUUID()

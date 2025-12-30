@@ -29,8 +29,8 @@ model Lead {
   lastName  String
   email     String
   phone     String
-  status    LeadStatus @relation(fields: [statusId], references: [id])
-  statusId  String
+  leadStatus    LeadStatus @relation(fields: [leadStatusId], references: [id])
+  leadStatusId  String
   user      User       @relation(fields: [userId], references: [id])
   userId    String
   isActive  Boolean    @default(true)

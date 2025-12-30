@@ -31,11 +31,11 @@ export class LeadsService {
 
       const where: Prisma.LeadWhereInput = {};
 
-      const { limit = 10, offset = 0, statusId, userId } = filters;
+      const { limit = 10, offset = 0, leadStatusId, userId } = filters;
 
-      if (statusId) {
-        where.statusId = {
-          contains: statusId,
+      if (leadStatusId) {
+        where.leadStatusId = {
+          contains: leadStatusId,
           mode: 'insensitive',
         }
       }
@@ -53,6 +53,10 @@ export class LeadsService {
           skip: offset,
           take: limit,
           orderBy: { createdAt: 'desc' },
+          include: {
+            leadStatus: true,
+            user: true,
+          },
         }),
         this.prisma.lead.count({
           where,

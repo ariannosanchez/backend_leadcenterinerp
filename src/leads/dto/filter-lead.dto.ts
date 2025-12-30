@@ -7,10 +7,10 @@ export class FilterLeadDto extends PaginationDto {
 
     @IsOptional()
     @IsUUID()
-    statusId?: string;
+    leadStatusId: string;
 
     @IsOptional()
     @IsUUID()
-    userId?: string;
+    userId: string;
 
 }
