@@ -29,12 +29,18 @@ export class LeadsController {
   }
 
   @Patch(':id')
+  async changeStatus(@Param('id', ParseUUIDPipe) id: string, @Body() updateLeadDto: UpdateLeadDto) {
+    return await this.leadsService.update(id, updateLeadDto);
+  }
+
+
+  @Delete(':id')
   async delete(@Param('id', ParseUUIDPipe) id: string) {
     return await this.leadsService.delete(id);
   }
 
-  @Delete(':id')
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
-    return await this.leadsService.remove(id);
-  }
+  // @Delete(':id')
+  // async remove(@Param('id', ParseUUIDPipe) id: string) {
+  //   return await this.leadsService.remove(id);
+  // }
 }

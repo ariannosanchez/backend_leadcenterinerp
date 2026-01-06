@@ -49,7 +49,7 @@ export class LeadsService {
 
       const [data, total] = await Promise.all([
         this.prisma.lead.findMany({
-          where,
+          where: { isActive: true },
           skip: offset,
           take: limit,
           orderBy: { createdAt: 'desc' },
@@ -59,7 +59,7 @@ export class LeadsService {
           },
         }),
         this.prisma.lead.count({
-          where,
+          where: { isActive: true }
         })
       ])
 
@@ -75,10 +75,8 @@ export class LeadsService {
 
   async findOne(id: string): Promise<Lead> {
     try {
-      const lead = await this.prisma.lead.findUnique({
-        where: {
-          id,
-        },
+      const lead = await this.prisma.lead.findFirst({
+        where: { id, isActive: true }
       })
 
       if (!lead) {
@@ -118,13 +116,11 @@ export class LeadsService {
       await this.findOne(id);
 
       return await this.prisma.lead.update({
-        where: {
-          id,
-        },
+        where: { id },
         data: {
           isActive: false,
         },
-      })
+      });
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
       throw DbExceptionHandler.handle(error, LeadsService.name);
